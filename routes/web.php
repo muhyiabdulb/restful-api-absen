@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test', function () {
+Route::get('/soal-1', function () {
     $socs = [5,7,7,9,10,4,5,10,6,5];
     $socs2 = [6,5,2,3,5,2,2,1,1,5,1,3,3,3,5];
     $socs3 = [1,1,3,1,2,1,3,3,3,3];
@@ -34,4 +34,29 @@ Route::get('/test', function () {
     }
     
     findPair($socs3);
+});
+
+Route::get('/soal-2', function () {
+    $input = "Saat meng*ecat tembok, Agung dib_antu oleh Raihan.";
+    $input2 = "Kemarin Shopia per[gi ke mall.";
+    $input3 = "Berapa u(mur minimal[ untuk !mengurus ktp?";
+
+    function countWords($text) {
+        $arr = explode(" ", $text);
+    
+        $temp = [];
+        foreach($arr as $i => $val) {
+            if(!hasSpecialChar($val)) $temp[] = $val;
+        }
+
+        print_r(count($temp));
+    }
+
+    function hasSpecialChar($my_string){
+        $regex = preg_match('/[\'^£$%&*()}{@#~?!><>|=_+¬-]/', $my_string);
+        if($regex) return true;
+        else return false;
+    }
+
+    countWords($input2);
 });
