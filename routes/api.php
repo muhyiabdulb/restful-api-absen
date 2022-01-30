@@ -47,6 +47,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('get-present', [UserController::class, 'getPresent'])->name('getPresent');
     });
 
+    Route::resource('programs', App\Http\Controllers\API\ProgramController::class);
+    
     // API route for logout user
     Route::post('/logout', [AuthController::class, 'logout']);
 });
