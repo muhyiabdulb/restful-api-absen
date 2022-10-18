@@ -22,21 +22,26 @@ class ProgramController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(),[
-            'name' => 'required|string|max:255',
-            'desc' => 'required'
-        ]);
+        try {
+            $validator = Validator::make($request->all(),[
+                'name' => 'required|string|max:255',
+                'desc' => 'required'
+            ]);
 
-        if($validator->fails()){
-            return response()->json($validator->errors());       
+            if($validator->fails()){
+                return response()->json($validator->errors());       
+            }
+
+            $program = Program::create([
+                'name' => $request->name,
+                'desc' => $request->desc
+             ]);
+
+            return response()->json(['Program created successfully.', new ProgramResource($program)]);
+        } catch (\Exception $e) {
+            \Log::error($e);
+            return "Ops! Terjadi Kesalahan";
         }
-
-        $program = Program::create([
-            'name' => $request->name,
-            'desc' => $request->desc
-         ]);
-        
-        return response()->json(['Program created successfully.', new ProgramResource($program)]);
     }
 
     public function show($id)
