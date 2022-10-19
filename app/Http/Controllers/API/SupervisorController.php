@@ -26,36 +26,41 @@ class SupervisorController extends Controller
 
     public function addUser(Request $request)
     {   
-        $user = auth()->user();
+        try {
+            $user = auth()->user();
 
-        if($user['npp_supervisor'] !== null) {
+            if($user['npp_supervisor'] !== null) {
+                return response()
+                    ->json(['message' => 'Sorry you are not a supervisor :)']);
+            }
+
+            $validator = Validator::make($request->all(),[
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'npp' => 'required|min:5|unique:users',
+                'password' => 'required|string|min:8'
+            ]);
+
+            if($validator->fails()){
+                return response()->json($validator->errors());       
+            }
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'npp' => $request->npp,
+                'npp_supervisor' => auth()->user()->npp,
+                'password' => bcrypt($request->password)
+             ]);
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()
-                ->json(['message' => 'Sorry you are not a supervisor :)']);
+                ->json(['message' => 'Success add data', 'data' => $user,'access_token' => $token, 'token_type' => 'Bearer', ]);
+        } catch (\Exception $e) {
+            \Log::error($e);
+            return "Ops! Terjadi Kesalahan";
         }
-
-        $validator = Validator::make($request->all(),[
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'npp' => 'required|min:5|unique:users',
-            'password' => 'required|string|min:8'
-        ]);
-
-        if($validator->fails()){
-            return response()->json($validator->errors());       
-        }
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'npp' => $request->npp,
-            'npp_supervisor' => auth()->user()->npp,
-            'password' => bcrypt($request->password)
-         ]);
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()
-            ->json(['message' => 'Success add data', 'data' => $user,'access_token' => $token, 'token_type' => 'Bearer', ]);
     }
     
     public function getUser()
